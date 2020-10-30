@@ -1,0 +1,152 @@
+#include<iostream>
+
+using namespace std;
+//Algoritmo Bellman-Ford
+//En el main vamos a crear la matriz con sus respectivos valores
+
+//Estructura de nodo con caracteristicas
+//El número inicial referencial, el número destino y el peso
+struct conexion {
+	int NodoIn, NodoDes, NodoPeso;
+};
+
+struct Grafo {
+	//Cantidad de vertices y la cantidad de conexión que existen en el grafo
+	int vertice, conexion_nodos;
+	conexion* NuvCon;
+};
+//Creamos la clase para crear nuestro grafo
+struct Grafo* crearGrafo(int verticeAsig, int conexionAsig) {
+	//Hacemos un puntero hacia los nuevos datos del nuevo grafo
+	Grafo* nuevoGrafo = new Grafo();
+	nuevoGrafo->vertice = verticeAsig;
+	nuevoGrafo->conexion_nodos = conexionAsig;
+	nuevoGrafo->NuvCon = new conexion[conexionAsig];
+	return nuevoGrafo;
+}
+//Crear una función que imprima el arreglo
+void imprimirArreglo(int Conexion[], int cantidadTotal) {
+	cout << "Tabla de los vertices" << endl;
+	for (int i = 0; i < cantidadTotal; i++) {
+		cout << i << "  " << Conexion[i] << endl;
+	}
+}
+
+//Algoritmo Bellman Ford
+void Bellman_Ford(Grafo* GrafoNuevo, int NodoIn,int valores[]) {
+	int Num = GrafoNuevo->vertice;
+	int conexion_nodos = GrafoNuevo->conexion_nodos;
+	//Paso 1 tenemos que inicializar todos al máximo, INT_MAX
+	for (int i = 0; i < Num ; i++) {
+		valores[i] = INT_MAX;
+	}
+	valores[NodoIn] = 0;
+	//Paso 2 sumamos la distancia de los nodos hacia otro
+	for (int i = 1; i <= Num - 1; i++) {
+		for (int j = 0; j < conexion_nodos; j++) {
+			int Origen = GrafoNuevo->NuvCon[j].NodoIn;
+			int destino = GrafoNuevo->NuvCon[j].NodoDes;
+			int pesoDeNodo = GrafoNuevo->NuvCon[j].NodoPeso;
+			//Hacemos la condición para ver si el número es mayor hacia una ruta
+			if (valores[Origen] != INT_MAX && valores[Origen] + pesoDeNodo < valores[destino]) {
+				valores[destino] = valores[Origen] + pesoDeNodo;
+			}
+		}
+	}
+	//Paso 3 chequeamos que no se generen ciclo
+	for (int i = 0; i < conexion_nodos; i++) {
+		int Origen = GrafoNuevo->NuvCon[i].NodoIn;
+		int destino = GrafoNuevo->NuvCon[i].NodoDes;
+		int pesoDeNodo = GrafoNuevo->NuvCon[i].NodoPeso;
+		if (valores[Origen] != INT_MAX && valores[Origen] + pesoDeNodo < valores[destino]) {
+			cout << "Ciclo ... " << endl;
+			return;
+		}
+	}
+	imprimirArreglo(valores, Num);
+	return;
+}
+void TablaDevalor(Grafo* GrafoActual,int arr[],int posicion,int arr2[],int agrega ){
+	int valor = 0;
+	for (int i = 0; i < GrafoActual->conexion_nodos; i++) {
+		if (GrafoActual->NuvCon[i].NodoIn == posicion) {
+			arr[agrega] = GrafoActual->NuvCon[i].NodoPeso;
+			arr2[agrega] = GrafoActual->NuvCon[i].NodoDes;
+			agrega;
+		}
+	}	
+}
+void ImprimirTabla(Grafo* GrafoActual) {
+	int valor = 0;
+	for (int i = 0; i < GrafoActual->vertice; i++) {
+		cout<<"  " << i << "  ";
+		int arr[20];
+		int arr2[20];
+		
+		TablaDevalor(GrafoActual,arr,i,arr2,0);	
+		for (int j = 0; j < GrafoActual->vertice; j++) {
+			if (j == i ) {
+				cout << "  -  ";
+			}
+			if (arr2[valor] == j) {
+				cout << "  "<<arr[j] << "  ";
+				valor++;
+			}
+			else {
+				cout << "  In  ";
+			}
+		}
+		cout << endl;
+
+	}
+}
+int main() {
+	int vertice = 5;
+	int conexion = 8;
+	
+	Grafo* grafonuevo = crearGrafo(vertice, conexion);
+	int valores[100];
+	// add edge 0-1 (or A-B in above figure) 
+	grafonuevo->NuvCon[0].NodoIn = 0;
+	grafonuevo->NuvCon[0].NodoDes = 1;
+	grafonuevo->NuvCon[0].NodoPeso = -1;
+
+	// add edge 0-2 (or A-C in above figure) 
+	grafonuevo->NuvCon[1].NodoIn = 0;
+	grafonuevo->NuvCon[1].NodoDes = 2;
+	grafonuevo->NuvCon[1].NodoPeso = 5;
+
+	// add edge 1-2 (or B-C in above figure) 
+	grafonuevo->NuvCon[2].NodoIn = 1;
+	grafonuevo->NuvCon[2].NodoDes = 2;
+	grafonuevo->NuvCon[2].NodoPeso = 10;
+
+	// add edge 1-3 (or B-D in above figure) 
+	grafonuevo->NuvCon[3].NodoIn = 1;
+	grafonuevo->NuvCon[3].NodoDes = 3;
+	grafonuevo->NuvCon[3].NodoPeso = 1;
+
+	// add edge 1-4 (or A-E in above figure) 
+	grafonuevo->NuvCon[4].NodoIn = 1;
+	grafonuevo->NuvCon[4].NodoDes = 4;
+	grafonuevo->NuvCon[4].NodoPeso = -2;
+
+	// add edge 3-2 (or D-C in above figure) 
+	grafonuevo->NuvCon[5].NodoIn = 3;
+	grafonuevo->NuvCon[5].NodoDes = 2;
+	grafonuevo->NuvCon[5].NodoPeso = 15;
+
+	// add edge 3-1 (or D-B in above figure) 
+	grafonuevo->NuvCon[6].NodoIn = 3;
+	grafonuevo->NuvCon[6].NodoDes = 1;
+	grafonuevo->NuvCon[6].NodoPeso = 12;
+
+	// add edge 4-3 (or E-D in above figure) 
+	grafonuevo->NuvCon[7].NodoIn = 4;
+	grafonuevo->NuvCon[7].NodoDes = 3;
+	grafonuevo->NuvCon[7].NodoPeso = -3;
+	Bellman_Ford(grafonuevo, 0,valores);
+	cout << endl; 
+	//ImprimirTablaRelacion(grafonuevo);
+	return 0;
+}
